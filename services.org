@@ -491,8 +491,7 @@ services:
 - Configure Memory requests and limits
 - Configure CPU requests
 - Get comfortable getting thread and heap dumps
-- Heap dump on out of memory (this /will/ happen)
-  * =-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/dumps= to an =emptyDir= volume
+- Configure your runtime to create a heap dump on out of memory (this /will/ happen)
 ** Configuration
 *** Handling of externalized values
 - Externalize "magic numbers" and strings
@@ -501,11 +500,11 @@ services:
   * /External/ (mounted as a volume) has settings specific for that environment and/or server
 - Changes to configuration files
   * Kubernetes: Configmap change does /not/ restart the pod
-  * Hot reloading? Not in spring boot (watch file and shutdown instead)
+  * Hot reloading? Not wise in most languages/architectures (watch file and shutdown instead)
 - Environment variables for secrets: don't do it (leaking to docker, monitoring tools)
   * use files instead
 - Environment variables for service injection: don't do it (ordering issues)
-  * use dns instead (e.g. dns-java, akka discovery, [...])
+  * use DNS instead (SRV records)
 ** Load balancer
 *** Allowing the world to call your service
 - Deployed kubernetes services only reachable within the cluster
@@ -563,7 +562,7 @@ services:
   * Primary goal is a mutual understanding of the domain
 
 - Alberto Brandolini (2012): [[https://www.eventstorming.com/book/][Event Storming]]
-
+*** Event storming elements
 - Discover events that occur in the business, and what triggers them
   * *Business Event*, e.g. /a customer has applied for a loan/
     - A change has occurred (in your business or in the real world)
@@ -579,7 +578,7 @@ services:
 
 - Why do you think the focus is on /Events/, rather than /Aggregates/?
 *** Event storming workshop (example)
-- An small example of all concepts is [[https://excalidraw.com/#json=vxsHdxpc7576WIp-WA8TC,vWuOODe-XG1sA4K0NtGPnw][here]]
+- An small example of all concepts is [[https://excalidraw.com/#json=0g8-tTwSW5KuYNPlmE-D6,ORoF0cInwYjqp18xlr0GUg][here]]
 [[file:graphics/svg/event-storming-excalidraw.png]]
 ** Data design patterns
 *** Idempotency
