@@ -12,7 +12,7 @@
 
 [[file:graphics/lb-logo_stort_1363x359.jpg]]
 
-Freely available here:
+Slides available here:
 [[https://github.com/jypma/LB3212-services][https://github.com/jypma/LB3212-services]]
 
 - PDF of slides will be available at completion
