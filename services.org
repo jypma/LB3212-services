@@ -1,4 +1,4 @@
-#+TITLE: Microservices with Java and Spring Boot
+#+TITLE: Microservices and Domain-Driven Design
 #+PROPERTY: header-args:plantuml :exports results :var _dpi_="150"
 #+options: H:3
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=blue}
@@ -10,7 +10,7 @@
 *** This course
 
 
-[[file:graphics/lb-logo_stort_1363x359.jpg]]
+[[file:graphics/lb-ti.png]]
 
 Slides available here:
 [[https://github.com/jypma/LB3212-services][https://github.com/jypma/LB3212-services]]
