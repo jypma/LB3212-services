@@ -137,16 +137,16 @@ A single resource pool is covering multiple types of application requests
 
 [[file:graphics/svg/with_bulkhead.png]]
 *** Measure service quality
+- Service Level Indicator (SLI)
+  + An actual number that indicates the current value of an /SLO/, e.g.
+    * 99th percentile response time
+    * 24-hour window success rate of HTTP requests
+
 - Service Level Objective (SLO)
   + Metric that indicates a healthy service to you, e.g.
     * /"The 99th percentile of HTTP response times is at most 300ms"/
     * /"At least 99.9% of HTTP requests result in a successful response"/
   + Typically only internally measured and/or agreed between teams
-
-- Service Level Indicator (SLI)
-  + An actual number that indicates the current value of an /SLO/, e.g.
-    * 99th percentile response time
-    * 24-hour window success rate of HTTP requests
 
 - Service Level Agreement (SLA)
   + Part of a contractual obligation (sometimes legally binding) between parties
@@ -295,7 +295,7 @@ Messages typically small (some services have upper limit of 64kB).
 - Open source: Kafka
 - Amazon: SQS
 - Google: Cloud Pub/Sub
-- Azure: Storage Queue ( * ) , Service Bus ( * )
+- Azure: Storage Queue ( * ) , Service Bus ( * ), Event Hub
 
 ( * ) /not partitioned, size-limited/
 *** Partitioned search
@@ -979,7 +979,7 @@ This is not a full list.
 - Find resources for your domain
   + Perhaps using an /Event Storming/ workshop (from /Domain-Driven Design/)
 - Use CQRS (Command Query Response Segregation)
-  + Find representations for those resources (current state and/or events): =GET=
+  + Find representations for those resources (current state and/or events): =GET=, =HEAD=
   + Find commands affecting those resources (creation, modification, transactions): =POST=, =PUT=, =PATCH=, =DELETE=
 - Size limits on everything (do we need to stream or read it in memory?)
 - XML, JSON, CSV, text, protobuf (more content-type negotiation later)
@@ -1048,7 +1048,7 @@ GET http://example.com/widgets/15
 200 OK
 Content-Type: application/json
 ETag: "524"
-Last-Modified: Wed, 21 Oct 2015 07:28:00 GMT
+Last-Modified: Wed, 21 Oct 2015 07:28:00 UTC
 #+END_SRC
 - Request header exist that perform checks against the last-modified date, like =ETag=:
   * =If-Modified-Since= executes the request /only/ if the last-modified is past the given date
@@ -1124,7 +1124,7 @@ Accept: application/json;q=0.9, text/xml
 GET http://localhost/journal/events?since=Wed+May+26+11:59:05+2021+UTC&limit=50
 Accept: application/json
 #+END_SRC
-  * Hanging GET
+  * Hanging GET (/long polling/)
 #+BEGIN_SRC restclient
 GET http://localhost/journal/events?since=Wed+May+26+11:59:05+2021+UTC&limit=50&maxwait=60000
 Accept: application/json
@@ -1190,7 +1190,7 @@ Accept: application/vnd.example.myresource.v2+json
 - The meaning of query parameters may themselves be versioned
 *** Versioning in path
 #+BEGIN_SRC restclient
-GET http://localhost/service/versions/1/myresource
+GET http://localhost/service/versions/v1/myresource
 #+END_SRC
 - Often used as first choice
 - Should be your last resort:
@@ -1288,7 +1288,7 @@ Notes:
   + spec: https://github.com/raml-org/raml-spec/blob/master/versions/raml-10/raml-10.md
   + online editor: https://raml-org.github.io/playground/learn_raml.html
 - OpenAPI
-  + spec: https://spec.openapis.org/oas/latest.htmla
+  + spec: https://spec.openapis.org/oas/latest.html
   + online editor: https://editor.swagger.io/
 *** Discussion
 - One team makes their RAML or OpenAPI file available
