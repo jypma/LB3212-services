@@ -3,9 +3,12 @@
 #+options: H:3
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=blue}
 #+LATEX_CLASS_OPTIONS: [8pt]
+#+EXCLUDE_TAGS: comment
+
 * Introduction
 ** Getting started
 *** Welcome
+#+ATTR_HTML: :width 30%
 [[file:graphics/microservices.png]]
 *** This course
 
@@ -18,20 +21,13 @@ Slides available here:
 - PDF of slides will be available at completion
 - Pull requests with fixes to our typos are welcome :-)
 
-*** About your instructors
+*** About your instructor
 - Jan Ypma
   * Java, Scala, Groovy, C++, Rust, Lisp
   * Contributor to various open source projects
   * Fan of functional programming and distributed systems
   * Agile coach
   * =jan@ypmania.net=, https://linkedin.com/in/jypma
-
-- Jakob Bendsen
- * 20+ years of IT and Java experience
- * Teaching at ITU and numerous courses in Danish IT industry
- * Experience with Java/Jakarta EE and Spring (Boot)
- * Likes Kotlin and elegant programs
- * =jakob@logb.dk=, https://linkedin.com/in/jbendsen
 
 
 *** Schedule, day 1
@@ -68,6 +64,7 @@ Slides available here:
 - What do I hope to get out of the course
 - What's the smallest service I've ever written
 ** What's a microservice
+[[file:img/00000-2481886221-a miniature landscape with houses and shops.png]]
 *** Definition
 - /Service/
   * One operating system process (often on its own server)
@@ -83,6 +80,7 @@ Slides available here:
   * Rebuilt in 1-3 months
 - Per service, use best technology matching experience and requirements
 *** Service scope
+[[file:img/00001-3407228958-one miniature house with a sign and a horse.png]]
 - Service belongs to one team
   * Team is responsible for entire service software life cycle
 - Data store belongs to one service
@@ -104,41 +102,43 @@ Slides available here:
 7. Transport cost is zero.
 8. The network is homogeneous.
 
+[[file:img/00003-3681397759-a pile of broken calculators and computers in color.png]]
 *** How well does the following abstraction help?
 
-#+BEGIN_SRC java
+#+BEGIN_SRC c
 MyResponseType callMyRemoteService(String command, byte[] data)
 #+END_SRC
 
 * Design for resilience
 ** Service failure
 *** Your (or your colleague's) service will be down
-P(everything working) = P(one service is working) ^ n_services
+[[file:img/00004-2201003232-a miniature house on fire.png]]
+
+\begin{equation}
+P(everything \: working) = P(one \: service \: is \: working)^{n}
+\end{equation}
 
 /Our service is up 99% of the time!/
 
 Well, we have about 30 microservices, each with 3 copies.
 That means that 63% of the time, at least one service is down somewhere.
 ** Creating services
-*** Guidelines
-- Prefer sharded (partitioned) data stores over single points of failure
-- Idempotency for all incoming data
-- Always deploy more than 1 copy
-  * Investigate the need for a cluster-aware distributed framework
-- Have a /Service dashboard/ with metrics (more on that later)
-- Use =Bulkhead= to protect finite resources
+*** Bulkhead
+[[file:img/00006-2933510010-cruise ship under water with iceberg.png]]
 *** Bulkhead
 A single resource pool is covering multiple types of application requests
 
+#+ATTR_HTML: :width 50%
 [[file:graphics/svg/without_bulkhead.png]]
 *** Bulkhead in place
 - Semaphore with an optional timed queue in front
 - Other parts of the resource pool are still accessible
 
+#+ATTR_HTML: :width 50%
 [[file:graphics/svg/with_bulkhead.png]]
 *** Measure service quality
 - Service Level Indicator (SLI)
-  + An actual number that indicates the current value of an /SLO/, e.g.
+  + An actual number that indicates something that relates to service quality
     * 99th percentile response time
     * 24-hour window success rate of HTTP requests
 
@@ -153,6 +153,13 @@ A single resource pool is covering multiple types of application requests
     * /"The 95th percentile of HTTP response times is at most 1000ms"/
     * /"At least 99% of HTTP requests result in a successful response"/
   + Typically results in a stricter SLO being applied internally
+*** Recommendations
+- Prefer sharded (partitioned) data stores over single points of failure
+- Idempotency for all incoming data
+- Always deploy more than 1 copy
+  * Investigate the need for a cluster-aware distributed framework
+- Have a /Service dashboard/ with metrics (more on that later)
+- Use =Bulkhead= to protect finite resources
 ** Consuming services
 *** Guidelines
 - Design for failure
@@ -162,11 +169,12 @@ A single resource pool is covering multiple types of application requests
 - Fail fast
   * =System.exit(1)= is a viable error handler
 *** Circuit breaker
+[[file:img/00005-464144277-electronic circuit on fire.png]]
+*** Circuit breaker
 - Smart state machine towards 1 backend
   * /Closed/: Everything is working normally
   * /Open/: We've determined that the backend is down, and block requests
   * /Half-open/: We're allowing a few requests through, to test the waters
-
 #+BEGIN_SRC plantuml :file graphics/circuit-breaker-state.png :hidden
 skinparam dpi _dpi_
 hide empty description
@@ -184,6 +192,7 @@ Half_Open -> Open : [failure rate above threshold]
 #+END_SRC
 
 #+RESULTS:
+#+ATTR_HTML: :width 80%
 [[file:graphics/circuit-breaker-state.png]]
 
 ** Guidelines
@@ -202,6 +211,8 @@ Half_Open -> Open : [failure rate above threshold]
 - Not the only way (geared towards ruby/python), but worth a thorough read
 * Break(out) 1
 ** Service discovery
+[[file:img/00008-3647186381-miniature landscape with houses; magnifying glass.png]]
+
 *** Introduction
 - Break into teams of 2-4 people (20 min)
 - Discuss the services and projects you've been a part of (here or at a previous employer), and identify:
@@ -231,7 +242,8 @@ Half_Open -> Open : [failure rate above threshold]
 *** Partitioned data stores: introduction
 - All data is split into partitions (also called /shards/), which are copied onto servers
 - For each data element, a /key/ determines which partition it's stored on
-#+BEGIN_SRC plantuml :file graphics/partitioned-data-stores.png :hidden
+
+#+BEGIN_SRC plantuml :file graphics/partitioned-data-stores.png :hidden :post attr_wrap(data=*this*) :results output drawer
 skinparam dpi _dpi_
 skinparam linetype ortho
 
@@ -254,7 +266,11 @@ n1 <--> n3
 #+END_SRC
 
 #+RESULTS:
+:results:
+#+ATTR_HTML: :width 60%
 [[file:graphics/partitioned-data-stores.png]]
+:end:
+
 
 *** Partitioned row stores
 Each /row/ has a /key/ that specifies which partition(s) store data for that row. Data is typically stored in columns, following a schema.
@@ -343,9 +359,11 @@ Full-text search is often important when dealing with data.
   * This is async, so no guarantee that the server receives it
     + Two generals agree
 ** Monitoring and alerting
+[[file:img/00010-3914293771-several security cameras and a computer.png]]
 *** Introduction
 - Logging need not be a cross-cutting concern
   * Create monitored metrics instead
+  * Pro tip: monitor your log level counters
 - Your service dashboard is as important as your public API
   * Have metrics on /everything/
   * Dashboard should be visible to and understandable by non-team members
@@ -372,9 +390,13 @@ Full-text search is often important when dealing with data.
     + e.g. the response time to a request
   * /Distribution summary/ (sometimes called /histogram/ or even /gauge/): Recorded values (and units) that go with events
     + e.g. the size of incoming requests in bytes
+*** Example dashboard
+- You can use [[https://play.grafana.org/d/000000012/grafana-play-home?orgId=1][play.grafana.org]] with some example data
 ** Request tracing
+[[file:img/00012-2276053691-miniature landscape with a labyrinth of paths.png]]
 *** Complex service dependencies
 - Services can have complex calling stacks
+#+ATTR_HTML: :width 80%
 [[file:graphics/svg/tsflow.png]]
 
 - When something breaks, it's good to have a trace
@@ -387,6 +409,7 @@ Full-text search is often important when dealing with data.
 - [[https://www.jaegertracing.io/][Jaeger]] and [[https://zipkin.io/][Zipkin]]
   * Both have vast library and framework support
   * Many metrics framework support both backends
+#+ATTR_HTML: :width 60%
 [[file:graphics/zipkin.png]]
 ** Deployment
 *** Hosted, semi-hosted or self-hosted?
@@ -515,7 +538,10 @@ services:
 - Additional, external, load balancer in front of ingress controller
 * Break(out) 2
 ** Infrastructure discovery
+[[file:img/00013-1802991974-people digging a hole.png]]
+
 *** Introduction
+
 - Resume in your teams
 - Which pieces of infrastructure exist around the services you discovered?
 - Who "owns" or maintains them?
@@ -530,6 +556,8 @@ services:
 - Describe the infrastructure you have found
 * Data architecture
 ** Domain-driven design
+[[file:img/ddd.jpg]]
+
 *** Introduction
 - Software methodology
   * /Names in code must names used by the business/
@@ -555,6 +583,17 @@ services:
 
 - /Ubiqutous language/: All team members use important terms in the same way
   * Within a bounded context
+*** Implementation patterns
+DDD defines several patterns that are relevant as software architecture during implementation.
+
+- /Entity/: A mutable representation of one business concept
+
+- /Value Object/: An immutable set of data going to or from an /Entity/
+
+- /Aggregate/: A group of /Entities/ that should always have a consistent view
+
+Have you implemented similar patterns? What did you call them?
+
 *** Event storming workshop
 - We need to quickly learn a new domain
   * /Business process modeling/ and /requirements gathering/
@@ -805,7 +844,7 @@ message SearchRequest {
 | 12:50 |    00:30 | (Break)out 5                              |        |
 |-------+----------+-------------------------------------------+--------|
 | 13:20 |    00:15 | Discussions of breakout results           |        |
-| 13:35 |    00:20 | Microservice life cycle                   |        |
+| 13:35 |    00:20 | Microservice life cycle and testing       |        |
 | 13:55 |    00:10 | Security architecture                     |        |
 | 14:05 |    00:15 | Strategy and team dynamics                |        |
 | 14:20 |    00:30 | Group exercise (adoption)                 |        |
@@ -821,6 +860,7 @@ Who can tell us something about:
 
 [[file:graphics/svg/wordcloud-services.png]]
 * Getting your service used
+[[file:img/00015-3121364144-a miniature landscape with a gate arch in front of houses.png]]
 ** Public API
 *** An API is an interface
 - /Application Programming Interface/
@@ -833,7 +873,7 @@ Who can tell us something about:
 - Let's look at an [[file:demo-project/documentation/demo-api.html][example API]] example API together
   * Its [[file:demo-project/documentation/demo-api.raml][RAML source]] is available
 - Semantic format for describing REST APIs: RAML, OpenAPI
-  * RAML: YAML-based, better re-use, easier to write by hand
+  * RAML: YAML-based, semantic re-use, easier to write by hand
   * OpenAPI: JSON/YAML-based, more popular
 *** Content-type negotiation
 - Embrace content-type negotiation (XML /and/ JSON, not XML /or/ JSON)
@@ -1278,10 +1318,11 @@ Notes:
 - We're writing a pet store automation system, and need to be able to register, find, and sell pets.
 
 - We need APIs to:
-  * Register a newly purchased pet
+  * Register re-stocking of new pets for purchase
   * Register the feeding of pets
   * Search pets according to customer preferences
-  * Register the sale of a pet
+  * Register the sale of a pet to a customer
+  * Feel free to make up extra use cases
 
 - RAML
   + example: https://raml.org/developers/raml-200-tutorial
@@ -1290,10 +1331,12 @@ Notes:
 - OpenAPI
   + spec: https://spec.openapis.org/oas/latest.html
   + online editor: https://editor.swagger.io/
+  /(yes, there's also a pet store example here, but don't use that, it's our competitor! ;-)/
+
 *** Discussion
 - One team makes their RAML or OpenAPI file available
 - /Another/ team then tell us how to:
-  * Register a newly purchased pet
+  * Register a newly stocked pet
   * Register the feeding of pets
   * Search pets according to customer preferences
   * Register the sale of a pet
@@ -1506,15 +1549,19 @@ https://world.hey.com/joaoqalves/disasters-i-ve-seen-in-a-microservices-world-a9
 https://copyconstruct.medium.com/testing-in-production-the-safe-way-18ca102d0ef1
 
 * Notes
+** Helpers                                                          :comment:
+
+#+name: attr_wrap
+#+BEGIN_SRC sh :var data=""  :results output :hidden :export none
+  echo "#+ATTR_HTML: :width 60%"
+  echo "$data"
+#+END_SRC
+
 ** DDD
 - Check room for best event storming wall
 - Check room for (re)moving tables
 
 ** Other
-
-- Add rabbitMQ stream example
-- Pure function example (split up business logic and side effects)
-- Screen sharing of others??
 
 - Draw the UML diagram from https://developer.okta.com/blog/2019/08/22/okta-authjs-pkce
 - Add HTTP cats https://http.cat/401
